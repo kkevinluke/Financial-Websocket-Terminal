@@ -1,1 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Browser Financial Terminal</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body data-theme="dark">
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">BROWSER-ONLY MARKET TERMINAL</div>
+        <h1>Static Financial Terminal</h1>
+      </div>
+      <div class="status-cluster">
+        <div class="status-pill" id="connectionStatusPill">
+          <span class="status-dot"></span>
+          <span id="connectionStatusText">idle</span>
+        </div>
+        <div class="status-meta">
+          <span id="modeLabel">MODE: MOCK</span>
+          <span id="subscriptionCount">SUBS: 0</span>
+          <span id="reconnectInfo">RETRY: 0</span>
+        </div>
+      </div>
+    </header>
 
+    <main class="layout-grid">
+      <aside class="panel watchlist-panel">
+        <div class="panel-header">
+          <div>
+            <h2>Watchlist</h2>
+            <p>Add symbols or use terminal commands</p>
+          </div>
+        </div>
+
+        <form id="addForm" class="stack-md">
+          <div class="form-grid">
+            <label>
+              <span>Market</span>
+              <select id="marketSelect">
+                <option value="NASDAQ">NASDAQ</option>
+                <option value="NYSE">NYSE</option>
+                <option value="FX">FX</option>
+                <option value="EURONEXT">EURONEXT</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Symbol</span>
+              <input id="symbolInput" list="symbolSuggestions" autocomplete="off" placeholder="AAPL or EURUSD" />
+            </label>
+          </div>
+
+          <div class="toolbar-row">
+            <button type="submit" class="btn btn-primary">Add symbol</button>
+            <button type="button" id="connectButton" class="btn">Connect</button>
+            <button type="button" id="disconnectButton" class="btn btn-danger">Disconnect</button>
+          </div>
+
+          <label class="search-block">
+            <span>Filter watchlist</span>
+            <input id="watchlistSearch" placeholder="Search current watchlist" />
+          </label>
+
+          <label class="toggle-row">
+            <input id="modeToggle" type="checkbox" />
+            <span>Live mode</span>
+          </label>
+        </form>
+
+        <datalist id="symbolSuggestions"></datalist>
+
+        <div id="watchlistContainer" class="watchlist-container"></div>
+      </aside>
+
+      <section class="panel main-panel">
+        <div class="quote-grid">
+          <div class="quote-card">
+            <div class="quote-label">Selected symbol</div>
+            <div id="selectedSymbolLabel" class="quote-value">No symbol selected</div>
+            <div id="selectedPriceLabel" class="quote-subvalue">—</div>
+          </div>
+          <div class="quote-card">
+            <div class="quote-label">Last update</div>
+            <div id="selectedTimeLabel" class="quote-value">—</div>
+            <div id="selectedVolumeLabel" class="quote-subvalue">Volume —</div>
+          </div>
+          <div class="quote-card">
+            <div class="quote-label">Endpoint</div>
+            <div id="endpointLabel" class="quote-value endpoint-text">mock://local-stream</div>
+            <div id="protocolLabel" class="quote-subvalue">Protocol adapter: mock</div>
+          </div>
+        </div>
+
+        <div class="panel-header">
+          <div>
+            <h2>Live stream</h2>
+            <p>Ticks and system messages</p>
+          </div>
+        </div>
+        <div id="streamLog" class="stream-log" aria-live="polite"></div>
+
+        <div class="split-grid">
+          <section class="subpanel">
+            <div class="subpanel-header">
+              <h3>Recent ticks</h3>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Market</th>
+                    <th>Symbol</th>
+                    <th>Price</th>
+                    <th>Volume</th>
+                  </tr>
+                </thead>
+                <tbody id="ticksTableBody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="subpanel">
+            <div class="subpanel-header">
+              <h3>Mini chart</h3>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="chartCanvas" width="860" height="280"></canvas>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <aside class="panel side-panel">
+        <section class="subpanel">
+          <div class="subpanel-header">
+            <h3>Error log</h3>
+          </div>
+          <div id="errorLog" class="error-log"></div>
+        </section>
+
+        <section class="subpanel terminal-panel">
+          <div class="subpanel-header">
+            <h3>Command terminal</h3>
+          </div>
+          <div id="terminalOutput" class="terminal-output"></div>
+          <form id="commandForm" class="command-form" autocomplete="off">
+            <span class="prompt">$</span>
+            <input id="commandInput" placeholder="help, add NASDAQ AAPL, theme dark" />
+          </form>
+        </section>
+      </aside>
+    </main>
+
+    <footer class="footer-bar">
+      <span id="footerConnection">Status: idle</span>
+      <span id="footerSubscriptions">Active subscriptions: 0</span>
+      <span id="footerSelected">Selected: —</span>
+    </footer>
+  </div>
+
+  <script defer src="./config.js"></script>
+  <script defer src="./data/symbols.js"></script>
+  <script defer src="./utils/format.js"></script>
+  <script defer src="./services/storage.js"></script>
+  <script defer src="./services/dataAdapter.js"></script>
+  <script defer src="./services/wsClient.js"></script>
+  <script defer src="./ui/chart.js"></script>
+  <script defer src="./ui/watchlist.js"></script>
+  <script defer src="./ui/terminal.js"></script>
+  <script defer src="./app.js"></script>
+</body>
+</html>
