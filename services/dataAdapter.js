@@ -166,4 +166,73 @@ window.TerminalApp.services = window.TerminalApp.services || {};
     lines.forEach((line) => {
       const pieces = line.trim().split(/\s+/);
       if (pieces.length >= 4) {
-        const
+        const quote = normalizeQuote({
+          market: pieces[0],
+          symbol: pieces[1],
+          price: pieces[2],
+          volume: pieces[3]
+        });
+        if (quote) {
+          output.quotes.push(quote);
+        }
+      }
+    });
+
+    if (!output.quotes.length) {
+      output.malformed = true;
+      output.errors.push("No valid quotes found in text payload");
+    }
+
+    return output;
+  }
+
+  function parseIncoming(data) {
+    if (!data) {
+      return { quotes: [], info: [], errors: [], malformed: true };
+    }
+
+    if (typeof data === "string") {
+      const parsed = fmt.safeJsonParse(data);
+      if (parsed.ok) {
+        return parseStructuredEnvelope(parsed.value);
+      }
+      return parseTextPayload(data);
+    }
+
+    if (typeof data === "object") {
+      return parseStructuredEnvelope(data);
+    }
+
+    return { quotes: [], info: [], errors: [], malformed: true };
+  }
+
+  function buildSubscribe(item) {
+    return JSON.stringify({
+      type: "subscribe",
+      market: item.market,
+      symbol: item.symbol
+    });
+  }
+
+  function buildUnsubscribe(item) {
+    return JSON.stringify({
+      type: "unsubscribe",
+      market: item.market,
+      symbol: item.symbol
+    });
+  }
+
+  function buildHeartbeat() {
+    return JSON.stringify({
+      type: "ping",
+      time: Date.now()
+    });
+  }
+
+  services.dataAdapter = {
+    parseIncoming,
+    buildSubscribe,
+    buildUnsubscribe,
+    buildHeartbeat
+  };
+})(window.TerminalApp.services, window.TerminalApp.utils, window.TerminalApp.CONFIG);
